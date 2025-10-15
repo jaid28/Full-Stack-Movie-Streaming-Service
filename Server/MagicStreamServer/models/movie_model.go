@@ -1,4 +1,4 @@
-package model
+package models
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -6,7 +6,7 @@ import (
 
 type Genre struct {
 	GenreID   int    `bson:"genre_id" json:"genre_id"`
-	GenreName string `bson:"genre_name" json:"genre_ame"`
+	GenreName string `bson:"genre_name" json:"genre_name"`
 }
 
 type Ranking struct {
@@ -15,11 +15,12 @@ type Ranking struct {
 }
 
 type Movie struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	ImdbID      string             `bson:"imdb_id" json:"imdb_id" validate:"required"`
-	Title       string             `bson:"title" json:"title" vaidate:"required, min=2, max=500"`
+	Title       string             `bson:"title" json:"title" validate:"required,min=2,max=500"`
 	PosterPath  string             `bson:"poster_path" json:"poster_path" validate:"required,url"`
 	YouTubeID   string             `bson:"youtube_id" json:"youtube_id" validate:"required"`
 	Genre       []Genre            `bson:"genre" json:"genre" validate:"required,dive,required"`
-	AdminReview string             `bson:"admin_review" json:"admin_review" validate:"required,min=10,max=5000"`
+	AdminReview string             `bson:"admin_review" json:"admin_review"`
+	Ranking     Ranking            `bson:"ranking" json:"ranking" validate:"required"`
 }
