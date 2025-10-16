@@ -87,15 +87,40 @@ func UpdateAllTokens(UserId, token, refreshToken string) error {
 	return nil
 }
 
-func GetAccessToken(c *gin.Context) string {
+func GetAccessToken(c *gin.Context) (string, error) {
 	authHeader := c.Request.Header.Get("Authorization")
 	if authHeader == "" {
-		return "", errors.New("Authorization header is required")
-	}
-	tokenString := authHeader[len("Bearer "):]
-	if tokenString == "" {
-		return "", errors.New("Bearer token is required")
+		return "", errors.New("authorization header is required")
 	}
 
-	return tokenString
+	if len(authHeader) < len("Bearer ") {
+		return "", errors.New("invalid authorization header format")
+	}
+
+	tokenString := authHeader[len("Bearer "):]
+	if tokenString == "" {
+		return "", errors.New("bearer token is required")
+	}
+
+	return tokenString, nil
+}
+
+func ValidateToken(tokenString string) (*SignedDetails, error) {
+	claims := &SignedDetails{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SECRET_KEY), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, errors.New("invalid token")
+	}
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+	if claims.ExpiresAt.Time.Before(time.Now()) {
+		return nil, errors.New("token is expired")
+	}
+	return claims, nil
 }
