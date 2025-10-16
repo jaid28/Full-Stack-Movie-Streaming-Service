@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	controller "github.com/GavinLonDigital/MagicStreamMovies/Server/MagicStreamMoviesServer/controllers"
+	"StreamMovieServer/routes"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,10 +16,12 @@ func main() {
 		c.String(200, "Hello!!, StreamMovieServer")
 	})
 
-	router.GET("/movies", controller.GetMovies())
+	routes.SetupUnProtectedRoutes(router)
+	routes.SetupProtectedRoutes(router)
 
 	// Start the server on port 8080
 	if err := router.Run(":8080"); err != nil {
 		fmt.Println("Failed to start server:", err)
+
 	}
 }
